@@ -1,10 +1,7 @@
 package com.mfh.yueru.yueru;
 
 import com.google.gson.Gson;
-import com.google.gson.internal.Primitives;
 import okhttp3.*;
-
-import java.io.IOException;
 
 public class HTTPUtils {
     public static LoginEntity login() {
