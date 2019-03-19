@@ -913,9 +913,6 @@ public class DateUtils {
 //        System.out.println("" + instance.get(Calendar.WEEK_OF_MONTH));
 //        System.out.println("" + instance.getActualMaximum(Calendar.WEEK_OF_MONTH));
 //        System.out.println("" + instance.getMaximum(Calendar.WEEK_OF_MONTH));
-    System.out.println(getDaysByDate(new Date()));
-
-    Date nextWeekMonday = getNextWeekMonday(new Date());
-    Date a = getDateAfterDays(new Date(), 5);
+    HTTPUtils.doorLockHttp();
   }
 }

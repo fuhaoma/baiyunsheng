@@ -10,93 +10,96 @@ import okhttp3.Response;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 public class HTTPUtils {
-    public static LoginEntity login() {
-        Request request = new Request.Builder()
-                .post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ""))
-                .url("https://saas.lianyuplus.com/saas20/api/201410011/AptGuest/sysLogin/customer/authenticate" +
-                        "?pwd=ma123456&username=15516771992")
-                .build();
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Call call = okHttpClient.newCall(request);
-        try {
-            Response execute = call.execute();
-            String string = execute.body() != null ? execute.body().string() : "";
-            System.out.println("login"+string);
-            return new Gson().fromJson(string, LoginEntity.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+  public static LoginEntity login() {
+    Request request = new Request.Builder()
+      .post(RequestBody.create(MediaType.parse("application/json; charset=utf-8"), ""))
+      .url("https://saas.lianyuplus.com/saas20/api/201410011/AptGuest/sysLogin/customer/authenticate" +
+        "?pwd=ma123456&username=15516771992")
+      .build();
+    OkHttpClient okHttpClient = new OkHttpClient();
+    Call call = okHttpClient.newCall(request);
+    try {
+      Response execute = call.execute();
+      String string = execute.body() != null ? execute.body().string() : "";
+      System.out.println("login" + string);
+      return new Gson().fromJson(string, LoginEntity.class);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+    return null;
+  }
 
-    public static void doorLockHttp() {
-        System.out.println("------------------------------------------------------------------------------------------------");
-        String s=login().getData().getTicket();
-        deleteDoorLockHttp(s);
-        String lock= null;
-        try {
-            String start = DateUtils.getFormatDate( DateUtils.atDayStart(DateUtils.getDateAfterDays(new Date(),1)),DateUtils.DATE_TIME_H_M);
-            String end = DateUtils.getFormatDate(DateUtils.atDayStart(DateUtils.getDateAfterDays(new Date(),2)),DateUtils.DATE_TIME_H_M);
-            lock = URLEncoder.encode(String.format("[{\"lockId\":\"%s\",\"name\":\"1606Z门锁\",\"start\":\"%s\",\"end\":\"%s\"}]",getDoorLockHttp(s), start, end), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        Request request = new Request.Builder()
-                .post(RequestBody.create(MediaType.parse("application/application/x-www-form-urlencoded; charset=utf-8"), ""))
-                .addHeader("intebox_sso_tkt","5e9df071552e6f86cdc560aeb5d12588645bca94460dbc864f5d5ae9db5b2455")
-                .url("https://saas.lianyuplus.com/saas20/api/201410011/AptGuest/doorlock/batchAddWithArea" +
-                        "?areaId=16774&guestId=116704&operatorId=57643&locks="+lock)
-                .build();
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Call call = okHttpClient.newCall(request);
-        try {
-            Response execute = call.execute();
-            String string = execute.body() != null ? execute.body().string() : "";
-            System.out.println("doorLockHttp"+string);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        System.out.println("------------------------------------------------------------------------------------------------");
+  public static void doorLockHttp() {
+    System.out.println("------------------------------------------------------------------------------------------------");
+    String token = login().getData().getTicket();
+    deleteDoorLockHttp(token);
+    String lock = null;
+    try {
+      String start = DateUtils.getFormatDate(DateUtils.atDayStart(DateUtils.getDateAfterDays(new Date(), 1)), DateUtils.DATE_TIME_H_M);
+      String end = DateUtils.getFormatDate(DateUtils.atDayStart(DateUtils.getDateAfterDays(new Date(), 2)), DateUtils.DATE_TIME_H_M);
+      String lockId = getDoorLockHttp(token);
+      lock = URLEncoder.encode(String.format("[{\"lockId\":\"%s\",\"name\":\"1606Z门锁\",\"start\":\"%s\",\"end\":\"%s\"}]", lockId, start, end), StandardCharsets.UTF_8.toString())
+        .replaceAll("\\+", "%20");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
     }
+    Request request = new Request.Builder()
+      .post(RequestBody.create(MediaType.parse("application/application/x-www-form-urlencoded; charset=utf-8"), ""))
+      .addHeader("intebox_sso_tkt", token)
+      .url("https://saas.lianyuplus.com/saas20/api/201410011/AptGuest/doorlock/batchAddWithArea" +
+        "?areaId=16774&guestId=116704&operatorId=57643&locks=" + lock)
+      .build();
+    OkHttpClient okHttpClient = new OkHttpClient();
+    Call call = okHttpClient.newCall(request);
+    try {
+      Response execute = call.execute();
+      String string = execute.body() != null ? execute.body().string() : "";
+      System.out.println("doorLockHttp" + string);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    System.out.println("------------------------------------------------------------------------------------------------");
+  }
 
-    public static void deleteDoorLockHttp(String token) {
-        Request request = new Request.Builder()
-                .post(RequestBody.create(MediaType.parse("application/application/x-www-form-urlencoded; charset=utf-8"), ""))
-                .addHeader("intebox_sso_tkt",token)
-                .url("https://saas.lianyuplus.com/saas20/api/201410011/AptGuest/ads/showads/disable?positionId=6&roomId=16774")
-                .build();
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Call call = okHttpClient.newCall(request);
-        try {
-            Response execute = call.execute();
-            String string = execute.body() != null ? execute.body().string() : "";
-            System.out.println("deleteDoorLockHttp"+string);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+  public static void deleteDoorLockHttp(String token) {
+    Request request = new Request.Builder()
+      .post(RequestBody.create(MediaType.parse("application/application/x-www-form-urlencoded; charset=utf-8"), ""))
+      .addHeader("intebox_sso_tkt", token)
+      .url("https://saas.lianyuplus.com/saas20/api/201410011/AptGuest/ads/showads/disable?positionId=6&roomId=16774")
+      .build();
+    OkHttpClient okHttpClient = new OkHttpClient();
+    Call call = okHttpClient.newCall(request);
+    try {
+      Response execute = call.execute();
+      String string = execute.body() != null ? execute.body().string() : "";
+      System.out.println("deleteDoorLockHttp" + string);
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+  }
 
-    public static String getDoorLockHttp(String token) {
-        Request request = new Request.Builder()
-                .post(RequestBody.create(MediaType.parse("application/application/x-www-form-urlencoded; charset=utf-8"), ""))
-                .addHeader("intebox_sso_tkt",token)
-                .url("https://saas.lianyuplus.com/saas20/api/201410011/AptGuest/doorlock/keysandpower?operatorId=57643&areaId=16774")
-                .build();
-        OkHttpClient okHttpClient = new OkHttpClient();
-        Call call = okHttpClient.newCall(request);
-        try {
-            Response execute = call.execute();
-            String string = execute.body() != null ? execute.body().string() : "";
-            System.out.println("getDoorLockHttp"+string);
-            return new Gson().fromJson(string, Locks.class).getData().getMajorKeys().get(0).getTdId();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+  public static String getDoorLockHttp(String token) {
+    Request request = new Request.Builder()
+      .post(RequestBody.create(MediaType.parse("application/application/x-www-form-urlencoded; charset=utf-8"), ""))
+      .addHeader("intebox_sso_tkt", token)
+      .url("https://saas.lianyuplus.com/saas20/api/201410011/AptGuest/doorlock/keysandpower?operatorId=57643&areaId=16774")
+      .build();
+    OkHttpClient okHttpClient = new OkHttpClient();
+    Call call = okHttpClient.newCall(request);
+    try {
+      Response execute = call.execute();
+      String string = execute.body() != null ? execute.body().string() : "";
+      System.out.println("getDoorLockHttp" + string);
+      return new Gson().fromJson(string, Locks.class).getData().getMajorKeys().get(0).getTdId();
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+    return null;
+  }
 
 //    public static void main(String[] args) throws UnsupportedEncodingException {
 //        doorLockHttp();
