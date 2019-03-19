@@ -1,5 +1,7 @@
 HELP.md
 /target/
+/out/
+*.mf
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
