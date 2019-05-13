@@ -1,4 +1,4 @@
-package com.mfh.yueru.yueru;
+package com.mfh.yueru;
 
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.mfh.yueru.yueru;
+package com.mfh.yueru;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
